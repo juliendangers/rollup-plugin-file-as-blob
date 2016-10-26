@@ -17,7 +17,7 @@ export default function fileAsBlob ( options = {} ) {
 							str.split('').map(function(c) {return c.charCodeAt(0)})
 						)], {type: mime})
 					);
-				} catch() {
+				} catch (e) {
 					return "data:" + mime + (isBinary ? ";base64," : ",") + str;
 				}
 			}`.split('\n').map(Function.prototype.call, String.prototype.trim).join('');
