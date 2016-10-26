@@ -1,32 +1,36 @@
 import { readFileSync } from 'fs';
-import { Magic } from 'mmmagic';
+import { Magic, MAGIC_MIME_TYPE, MAGIC_MIME_ENCODING } from 'mmmagic';
 import { createFilter } from 'rollup-pluginutils';
 
 export default function image ( options = {} ) {
 	const filter = createFilter( options.include, options.exclude );
-	const magic = new Magic();
+	const magic = new Magic(MAGIC_MIME_TYPE | MAGIC_MIME_ENCODING);
 
 	return {
 		name: 'file-as-blob',
 
-		intro: `function __$strToBlobUri(str, mime, isBinary) {
-			try {
-				return window.URL.createObjectURL(
-					new Blob([Uint8Array.from(
-						str.split('').map(function(c) {return c.charCodeAt(0)})
-					)], {type: mime})
-				);
-			} catch() {
-				return "data:" + mime + (isBinary ? ";base64," : ",") + str;
-			}
-		}`,
+		intro: function() {
+			return `function __$strToBlobUri(str, mime, isBinary) {
+				try {
+					return window.URL.createObjectURL(
+						new Blob([Uint8Array.from(
+							str.split('').map(function(c) {return c.charCodeAt(0)})
+						)], {type: mime})
+					);
+				} catch() {
+					return "data:" + mime + (isBinary ? ";base64," : ",") + str;
+				}
+			}`.split('\n').map(Function.prototype.call, String.prototype.trim).join('');
+		},
 
 		load ( id ) {
+			if ( !filter( id ) ) { return null; }
+
 			return new Promise((res, rej)=> {
 
-				if ( !filter( id ) ) { return rej(); }
+				const tempData = readFileSync( id );
 
-				magic.detectFile(id, (mime)=>{
+				magic.detectFile(id, (err, mime)=>{
 
 					const charset = mime.split('; charset=')[1];
 
@@ -38,20 +42,12 @@ export default function image ( options = {} ) {
 
 					var code;
 					if (readEncoding === 'base64') {
-						code = `export default var bloburi = __$strToBlobUri(atob("${data}"), ${mime}, true);`
+						code = `export default __$strToBlobUri(atob("${data}"), "${mime}", true);`;
 					} else {
-						code = `export default var bloburi = __$strToBlobUri("${data}", ${mime}, false);`
+						code = `export default __$strToBlobUri("${data}", "${mime}", false);`;
 					}
 
-					const ast = {
-						type: 'Program',
-						sourceType: 'module',
-						start: 0,
-						end: null,
-						body: []
-					};
-
-					return res({ ast, code, map: { mappings: '' } });
+					return res({ code: code, map: { mappings: '' } });
 				});
 			});
 		}
