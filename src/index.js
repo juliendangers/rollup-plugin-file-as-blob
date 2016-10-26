@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { Magic, MAGIC_MIME_TYPE, MAGIC_MIME_ENCODING } from 'mmmagic';
 import { createFilter } from 'rollup-pluginutils';
 
-export default function image ( options = {} ) {
+export default function fileAsBlob ( options = {} ) {
 	const filter = createFilter( options.include, options.exclude );
 	const magic = new Magic(MAGIC_MIME_TYPE | MAGIC_MIME_ENCODING);
 
