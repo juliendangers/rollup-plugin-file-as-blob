@@ -1,6 +1,6 @@
 # rollup-plugin-file-as-blob
 
-Import any (binary) file as a blob URL.
+[Rollup](http://www.rollupjs.org) plugin to import any (binary) file as a [`blob:` URLs](http://caniuse.com/#search=Blob%20URLs).
 
 ## Installation
 
@@ -20,11 +20,11 @@ npm install --save-dev rollup-plugin-file-as-blob
 import fileAsBlob from 'rollup-plugin-file-as-blob';
 
 export default {
-  entry: 'src/index.js',
-  dest: 'dist/my-lib.js',
-  plugins: [
-    fileAsBlob()
-  ]
+	entry: 'src/index.js',
+	dest: 'dist/my-lib.js',
+	plugins: [
+		fileAsBlob()
+	]
 };
 ```
 
@@ -38,11 +38,12 @@ img.src = logo;
 document.body.appendChild( img );
 ```
 
-Binary data is encoded using base64, which means they will be 33% larger than the original size on disk.
+In that example, `logo` is just a string like `blob:http%3A//localhost%3A8080/12345678-1234-1234-1234567890abcdef0`,
+but under the hood it represents the contents of the `rollup.png` image.
 
-You should therefore only use this for small images where the convenience of having
-them available on startup (e.g. rendering immediately to a canvas without
-co-ordinating asynchronous loading of several images) outweighs the cost.
+Binary data is encoded using base64, which means they will be 33% larger than the
+original size on disk. Thus, it is advised to not use this plugin to pack large binary
+files (such as large images).
 
 Using [`blob:` URLs](http://caniuse.com/#search=Blob%20URLs) means that the browser
 (or the JS engine) will decode the data just once, instead of every time the data
@@ -50,9 +51,29 @@ is used. The alternative technique of using [`data:` URIs](http://caniuse.com/#f
 means that the data is decoded every time it is used.
 
 The downside is that the `blob:` URL technique does not work on IE9 or older, nor
-on Node.js environments.
+on Node.js environments. The plugin includes a fallback to use `data:` URLs in this
+case.
 
+It should be possible to use this rollup plugin to create `blob:` URLs to use with
+web workers. However, this hasn't been tested, so use at your own risk (and submit
+detailed bug reports and/or merge requests!)
 
+You can use the `include` and `exclude` options as in [most rollup plugins](https://github.com/rollup/rollup/wiki/Plugins#conventions), e.g.:
+
+```js
+// In rollup.config.js
+import fileAsBlob from 'rollup-plugin-file-as-blob';
+
+export default {
+	entry: 'src/index.js',
+	dest: 'dist/my-lib.js',
+	plugins: [
+		fileAsBlob({
+			include: '**/**.png',
+		})
+	]
+};
+```
 
 ## License
 

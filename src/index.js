@@ -9,7 +9,7 @@ export default function image ( options = {} ) {
 	return {
 		name: 'file-as-blob',
 
-		intro: function() {
+		intro: function () {
 			return `function __$strToBlobUri(str, mime, isBinary) {
 				try {
 					return window.URL.createObjectURL(
@@ -26,9 +26,7 @@ export default function image ( options = {} ) {
 		load ( id ) {
 			if ( !filter( id ) ) { return null; }
 
-			return new Promise((res, rej)=> {
-
-				const tempData = readFileSync( id );
+			return new Promise((res)=> {
 
 				magic.detectFile(id, (err, mime)=>{
 
