@@ -54,10 +54,6 @@ The downside is that the `blob:` URL technique does not work on IE9 or older, no
 on Node.js environments. The plugin includes a fallback to use `data:` URLs in this
 case.
 
-It should be possible to use this rollup plugin to create `blob:` URLs to use with
-web workers. However, this hasn't been tested, so use at your own risk (and submit
-detailed bug reports and/or merge requests!)
-
 You can use the `include` and `exclude` options as in [most rollup plugins](https://github.com/rollup/rollup/wiki/Plugins#conventions), e.g.:
 
 ```js
@@ -74,6 +70,19 @@ export default {
 	]
 };
 ```
+
+You can also use this rollup plugin to create `blob:` URLs to use with
+web workers. Just make sure that the `*.js` file you want to use in your web
+worker matches the `include` option, and that the order of transforms of that
+file is important.
+
+```js
+import workerCode from './my-worker-code.js';
+
+var myWorker = new Worker(workerCode);  // Again, workerCode is a blob: url, representing the .js file
+```
+
+
 
 ## License
 

@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-file-as-blob",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Import any (binary) file as a blob URL.",
   "main": "dist/rollup-plugin-file-as-blob.cjs.js",
   "jsnext:main": "dist/rollup-plugin-file-as-blob.es.js",
@@ -23,7 +23,7 @@
     "pretest": "npm run build:cjs",
     "build": "npm run build:cjs && npm run build:es",
     "build:cjs": "rollup -c -o dist/rollup-plugin-file-as-blob.cjs.js -f cjs",
-    "build:es": "rollup -c -o dist/rollup-plugin-file-as-blob.es.js -f es6",
+    "build:es": "rollup -c -o dist/rollup-plugin-file-as-blob.es.js -f es",
     "lint": "eslint src",
     "prepublish": "npm run lint && npm test && npm run build:es"
   },

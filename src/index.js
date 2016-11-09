@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync, realpathSync } from 'fs';
 import { Magic, MAGIC_MIME_TYPE, MAGIC_MIME_ENCODING } from 'mmmagic';
 import { createFilter } from 'rollup-pluginutils';
 
@@ -26,6 +26,8 @@ export default function fileAsBlob ( options = {} ) {
 		load ( id ) {
 			if ( !filter( id ) ) { return null; }
 
+			id = realpathSync(id);
+
 			return new Promise((res)=> {
 
 				magic.detectFile(id, (err, mime)=>{
@@ -36,12 +38,16 @@ export default function fileAsBlob ( options = {} ) {
 					if (charset === 'utf-8') readEncoding = 'utf8';
 					if (charset.indexOf('ascii') !== -1) readEncoding = 'ascii';
 
-					const data = readFileSync( id, readEncoding );
+					let data = readFileSync( id, readEncoding );
 
 					var code;
 					if (readEncoding === 'base64') {
 						code = `export default __$strToBlobUri(atob("${data}"), "${mime}", true);`;
 					} else {
+						// Unfortunately buble+rollup will create code that chokes
+						// with newlines/quotes when the contents are read from
+						// a file
+						data = data.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/"/g, '\\"');
 						code = `export default __$strToBlobUri("${data}", "${mime}", false);`;
 					}
 
