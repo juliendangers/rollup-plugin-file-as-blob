@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-file-as-blob",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Import any (binary) file as a blob URL.",
   "main": "dist/rollup-plugin-file-as-blob.cjs.js",
   "jsnext:main": "dist/rollup-plugin-file-as-blob.es.js",
