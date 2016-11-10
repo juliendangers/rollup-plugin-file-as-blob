@@ -47,8 +47,11 @@ export default function fileAsBlob ( options = {} ) {
 						// Unfortunately buble+rollup will create code that chokes
 						// with newlines/quotes when the contents are read from
 						// a file
-						data = data.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/"/g, '\\"');
-						code = `export default __$strToBlobUri("${data}", "${mime}", false);`;
+						data = data.replace(/\n/g, '\\n')
+						           .replace(/\r/g, '\\r')
+						           .replace(/"/g, '\\"')
+						           .replace(/sourceMappingURL/g, 'sourceMap" + "pingURL');
+						code = "export default __$strToBlobUri(\"" + data + "\", \"" + mime + "\", false);";
 					}
 
 					return res({ code: code, map: { mappings: '' } });
